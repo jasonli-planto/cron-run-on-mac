@@ -1,6 +1,6 @@
 [
     {
-        "cron": "0 * * * *",
+        "cron": "* * * * *",
         "task-reference": "./cron-event/example.py"
     }
 ]
