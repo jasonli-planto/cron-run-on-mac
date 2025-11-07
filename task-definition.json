@@ -1,6 +1,6 @@
 {
-    "example-task": {
-        "description": "This is an example task",
-        "location": "./task/example-task.py"
+    "git-pull-shacom-sit": {
+        "description": "This task fetches the latest changes from the remote repository and pulls them into the local branch.",
+        "location": "./task/git-pull-shacom-sit.py"
     }
 }
