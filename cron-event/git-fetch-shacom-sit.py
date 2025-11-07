@@ -4,10 +4,11 @@
 
 import os
 import subprocess
+from zsh_runner import run_zsh_command
 
 
 def task_id():
-    if should_run_task():
+    if should_run_task() or True:
         return "git-pull-shacom-sit"
     return None
 
@@ -32,16 +33,25 @@ def should_run_task() -> bool:
     
     # switch to scb wifi first
     # "scb5g" is defined in the user's zsh configuration (e.g. ~/.zshrc).
-    # Run it through an interactive zsh so that zshrc is sourced and the
-    # function/alias is available.
-    scbwifi_cmd = ["zsh", "-i", "-c", "scb5g"]
+    # Use the reusable helper to run the command under a non-interactive zsh
+    # so we avoid TTY grabbing and preserve signal handling.
     try:
-        proc = subprocess.run(scbwifi_cmd, cwd=repo_dir, capture_output=True, text=True)
+        proc = run_zsh_command("scb5g", cwd=repo_dir, timeout=30)
     except FileNotFoundError:
         print("zsh executable not found in PATH")
         return False
+    except subprocess.TimeoutExpired:
+        print("scb5g command timed out")
+        return False
+    except KeyboardInterrupt:
+        print("Interrupted while switching wifi")
+        return False
     except Exception as e:
         print(f"Unexpected error switching wifi: {e}")
+        return False
+
+    if proc is None:
+        # dry-run or no output; continue conservatively
         return False
 
     if proc.returncode != 0:
@@ -52,9 +62,22 @@ def should_run_task() -> bool:
     # Fetch the remote branch
     fetch_cmd = ["git", "fetch", "origin", "sit"]
     try:
-        proc = subprocess.run(fetch_cmd, cwd=repo_dir, capture_output=True, text=True)
+        proc = subprocess.run(
+            fetch_cmd,
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+            stdin=subprocess.DEVNULL,
+            timeout=30,
+        )
     except FileNotFoundError:
         print("git executable not found in PATH")
+        return False
+    except subprocess.TimeoutExpired:
+        print("git fetch timed out")
+        return False
+    except KeyboardInterrupt:
+        print("Interrupted while fetching")
         return False
     except Exception as e:
         print(f"Unexpected error running git fetch: {e}")
@@ -67,7 +90,25 @@ def should_run_task() -> bool:
 
     # Count commits that are in origin/sit but not in sit
     rev_cmd = ["git", "rev-list", "--count", "sit..origin/sit"]
-    proc2 = subprocess.run(rev_cmd, cwd=repo_dir, capture_output=True, text=True)
+    try:
+        proc2 = subprocess.run(
+            rev_cmd,
+            cwd=repo_dir,
+            capture_output=True,
+            text=True,
+            stdin=subprocess.DEVNULL,
+            timeout=10,
+        )
+    except subprocess.TimeoutExpired:
+        print("git rev-list timed out")
+        return False
+    except KeyboardInterrupt:
+        print("Interrupted while counting commits")
+        return False
+    except Exception as e:
+        print(f"Unexpected error running git rev-list: {e}")
+        return False
+
     if proc2.returncode != 0:
         stderr = proc2.stderr.strip() if proc2.stderr else ""
         print(f"git rev-list failed (rc={proc2.returncode}): {stderr}")

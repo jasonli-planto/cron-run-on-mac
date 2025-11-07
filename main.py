@@ -215,7 +215,7 @@ def shutdown_handler(signum, frame):
     logger.info(f"Received signal {signum}, shutting down gracefully...")
     
     if scheduler is not None:
-        scheduler.shutdown(wait=True)
+        scheduler.shutdown(wait=False)
         logger.info("Scheduler shut down successfully")
     
     sys.exit(0)
