@@ -1,6 +1,6 @@
 {
-    "git-pull-shacom-sit": {
+    "git-pull-bfm-sit": {
         "description": "This task fetches the latest changes from the remote repository and pulls them into the local branch.",
-        "location": "./task/git-pull-shacom-sit.py"
+        "location": "./task/git-pull-bfm-sit.py"
     }
 }

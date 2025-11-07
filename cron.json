@@ -1,6 +1,6 @@
 [
     {
         "cron": "* * * * *",
-        "task-reference": "./cron-event/git-fetch-shacom-sit.py"
+        "task-reference": "./cron-event/git-fetch-bfm-sit.py"
     }
 ]
