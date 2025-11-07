@@ -61,7 +61,7 @@ def should_run_task() -> bool:
         return False
 
     # Fetch the remote branch
-    fetch_cmd = ["git", "fetch", "origin", "{target_branch}"]
+    fetch_cmd = ["git", "fetch", "origin", f"{target_branch}"]
     try:
         proc = subprocess.run(
             fetch_cmd,

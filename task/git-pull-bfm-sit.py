@@ -74,9 +74,9 @@ def run():
 
     try:
         # 1) fetch and update sit branch
-        run_cmd("git fetch origin {target_branch}", cwd=repo_dir)
-        run_cmd("git checkout {target_branch}", cwd=repo_dir)
-        run_cmd("git pull origin {target_branch}", cwd=repo_dir)
+        run_cmd(f"git fetch origin {target_branch}", cwd=repo_dir)
+        run_cmd(f"git checkout {target_branch}", cwd=repo_dir)
+        run_cmd(f"git pull origin {target_branch}", cwd=repo_dir)
 
         # 2) run build script
         build_script = os.path.join(repo_dir, "build-scripts", "build-container-only.sh")
